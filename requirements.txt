@@ -4,4 +4,6 @@ yfinance
 scikit-learn
 backtrader
 ta
+transformers
+torch
 joblib

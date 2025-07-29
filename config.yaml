@@ -1,0 +1,17 @@
+project_root: "/content/drive/MyDrive/quant_backtest_ml"
+data:
+  raw: "data/raw"
+  processed: "data/processed"
+  alt: "data/altdata"
+models:
+  hf:
+    finbert: "models/hf/finbert"
+    tone: "models/hf/finbert-tone"
+  trained: "models/trained"
+tickers:
+  - "AAPL"
+  - "SPY"
+backtest:
+  start_date: "2019-01-01"
+  end_date:   "2024-12-31"
+  interval:   "1h"

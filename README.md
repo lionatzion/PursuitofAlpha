@@ -1,23 +1,11 @@
-# PursuitofAlpha
-PythonProjecttoBacktestandRLtopursueAlpha
-# Pursuit of Alpha
+# Quant Backtest ML
 
-This project aims to pursue Alpha (excess returns) by implementing robust **backtesting** frameworks and **regression analysis** techniques in Python.
+Medallion-style quant project.
 
-## Goals
-
-- **Backtest** trading strategies to evaluate their historical performance.
-- Utilize **regression analysis** to identify and optimize factors that contribute to Alpha.
-- Continuously add, refine, and perfect the methodologies and equations used for analysis.
-
-## Roadmap
-
-- [ ] Implement core backtesting engine.
-- [ ] Add regression and factor analysis modules.
-- [ ] Integrate data sources for historical pricing and fundamental information.
-- [ ] Design experiments to optimize for Alpha.
-- [ ] Document and visualize results for ongoing improvement.
-
----
-
-_This repository will be constantly updated as new features, equations, and improvements are developed._
+## Structure
+- data/: raw, processed, altdata
+- models/: trained, hf (FinBERT)
+- modules/: Python code
+- pipelines/: scripts
+- notebooks/: Colab & Jupyter
+- logs/: run outputs
