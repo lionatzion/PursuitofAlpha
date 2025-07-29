@@ -9,3 +9,9 @@ Medallion-style quant project.
 - pipelines/: scripts
 - notebooks/: Colab & Jupyter
 - logs/: run outputs
+
+## Disclaimer
+The repository presents a simplified example of an ML-based trading stra
+tegy. It is for educational purposes only and does not guarantee profitable trad
+ing results. Always validate strategies thoroughly with historical testing and u
+nderstand the risks before deploying real capital.
