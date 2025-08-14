@@ -1,0 +1,778 @@
+{
+  "name": "Pursuit of Alpha",
+  "version": "1.0.0",
+  "owner": "Ryan Scarborough",
+  "date_created": "2025-08-14",
+  "objective": "Systematically research, test, and deploy diversified short horizon and medium horizon equity strategies with strict risk controls and continuous retesting to emulate Medallion style edges.",
+  "core_principles": [
+    "Many small uncorrelated alphas",
+    "Fast feedback loops with walk forward validation",
+    "Strict data hygiene with leakage prevention",
+    "Ensemble first with robust risk sizing",
+    "Continuous retesting and thesis falsification"
+  ],
+  "project_directory": "projects/pursuit_of_alpha",
+  "project_structure": {
+    "directories": [
+      "config",
+      "data/raw",
+      "data/interim",
+      "data/processed",
+      "data/universe",
+      "data/vendor_docs",
+      "features",
+      "labels",
+      "models",
+      "backtests",
+      "live",
+      "execution",
+      "evaluation",
+      "notebooks",
+      "reports",
+      "research",
+      "risks",
+      "experiments",
+      "utils",
+      "logs",
+      "scripts",
+      "secrets",
+      "third_party",
+      "options",
+      "arbitrage",
+      "infra",
+      "docs"
+    ],
+    "files": [
+      "README.md",
+      "config/project.yaml",
+      "config/credentials.template.yaml",
+      "config/universe.yaml",
+      "config/risk.yaml",
+      "config/execution.yaml",
+      "requirements.txt",
+      "pyproject.toml",
+      "scripts/run_pipeline.py",
+      "scripts/run_backtest.py",
+      "scripts/run_paper_trade.py",
+      "scripts/run_live.py",
+      "scripts/retest_all.py",
+      "infra/dockerfile",
+      "infra/docker_compose.yaml",
+      "infra/mlflow_server.yaml",
+      "infra/dvc_config.yaml"
+    ]
+  },
+  "environment": {
+    "python_version": "3.11",
+    "primary_packages": [
+      "numpy",
+      "pandas",
+      "scipy",
+      "scikit_learn",
+      "xgboost",
+      "lightgbm",
+      "catboost",
+      "pytorch",
+      "numba",
+      "statsmodels",
+      "ta",
+      "mlflow",
+      "dvc",
+      "optuna",
+      "bayesian_optimization",
+      "vectorbtpro_or_vectorbt",
+      "backtrader",
+      "alphalens",
+      "pyportfolioopt",
+      "hmmlearn",
+      "ruptures",
+      "pmdarima",
+      "yfinance",
+      "sec_edgar_downloader",
+      "beautifulsoup4",
+      "requests",
+      "pydantic",
+      "hydra_core",
+      "pyyaml",
+      "polars"
+    ]
+  },
+  "data_sources": {
+    "market_data": {
+      "providers": [
+        "polygon",
+        "iex_cloud",
+        "tiingo",
+        "alpha_vantage",
+        "yfinance"
+      ],
+      "granularity": [
+        "tick",
+        "minute",
+        "hour",
+        "daily"
+      ],
+      "coverage": "US equities and ETFs",
+      "update_frequency": "intraday and end of day"
+    },
+    "fundamental_data": {
+      "providers": [
+        "sec_edgar",
+        "simfin",
+        "tiingo_fundamentals"
+      ],
+      "artifacts": [
+        "10K",
+        "10Q",
+        "8K",
+        "press_releases"
+      ],
+      "update_frequency": "as filed"
+    },
+    "sentiment_data": {
+      "providers": [
+        "news_api",
+        "reddit_pushshift",
+        "stocktwits",
+        "twitter_x_api",
+        "earnings_call_transcripts"
+      ],
+      "nlp_pipeline": [
+        "entity_linking",
+        "finbert_sentiment",
+        "keyword_tfidf",
+        "topic_modeling_bertopic"
+      ]
+    },
+    "options_data": {
+      "providers": [
+        "polygon",
+        "orats",
+        "quandl_options"
+      ],
+      "fields": [
+        "iv_surface",
+        "smile_skew",
+        "open_interest",
+        "bid_ask",
+        "greeks"
+      ]
+    },
+    "macro_data": {
+      "providers": [
+        "fred",
+        "bloomberg_placeholder",
+        "oecd"
+      ],
+      "fields": [
+        "rates",
+        "inflation",
+        "employment",
+        "growth"
+      ]
+    },
+    "alt_data": {
+      "providers": [
+        "google_trends",
+        "github_repos",
+        "web_traffic",
+        "satellite_placeholder"
+      ]
+    }
+  },
+  "universe": {
+    "base": "liquid_us_top_1000_by_adv",
+    "filters": [
+      "price_greater_than_2",
+      "adv_greater_than_2m",
+      "exclude_adrs",
+      "exclude_etns"
+    ],
+    "reconstitution": "monthly",
+    "survivorship_bias_free": true
+  },
+  "features": {
+    "technical": [
+      "sma_5_20_50_200",
+      "ema_12_26",
+      "rsi_2_14",
+      "macd",
+      "stoch",
+      "atr",
+      "keltner_band_position",
+      "bollinger_band_position",
+      "zscore_returns_1_5_20",
+      "vol_of_vol",
+      "overnight_return",
+      "gap_features",
+      "intraday_momentum",
+      "volume_pressure"
+    ],
+    "microstructure": [
+      "roll_spread_estimate",
+      "quote_imbalance",
+      "order_flow_imbalance",
+      "signed_trade_volume",
+      "vpIN_proxy"
+    ],
+    "fundamental": [
+      "quality_roic_growth",
+      "profitability_margins",
+      "value_pe_pb_ev_ebitda",
+      "leverage_net_debt_to_ebitda",
+      "revision_analyst_eps",
+      "accruals"
+    ],
+    "sentiment": [
+      "news_sentiment_daily",
+      "transcript_sentiment_qna",
+      "topic_surprise",
+      "social_buzz_intensity",
+      "sarcasm_filter_flag"
+    ],
+    "options": [
+      "atm_iv_level",
+      "term_structure_slope",
+      "skew_25d",
+      "smile_convexity",
+      "put_call_oi_ratio",
+      "gamma_exposure_proxy"
+    ],
+    "cross_asset": [
+      "rates_level_change",
+      "usd_dxy_change",
+      "vix_term_slope",
+      "commodity_beta"
+    ],
+    "regime": [
+      "hmm_state",
+      "vol_regime",
+      "market_breadth",
+      "liquidity_regime"
+    ]
+  },
+  "labels": {
+    "targets": [
+      "future_return_1d",
+      "future_return_5d",
+      "future_return_20d",
+      "direction_1d",
+      "direction_5d",
+      "risk_adjusted_return"
+    ],
+    "labeling_methods": [
+      "fixed_horizon",
+      "triple_barrier"
+    ]
+  },
+  "models": {
+    "base_learners": [
+      "logistic_regression",
+      "ridge_lasso",
+      "random_forest",
+      "xgboost",
+      "lightgbm",
+      "catboost",
+      "svm",
+      "knn",
+      "mlp",
+      "lstm",
+      "tcn",
+      "transformer_tabular"
+    ],
+    "ensembles": [
+      "stacked_generalization",
+      "voting_weighted_by_ir",
+      "bagging_time_aware"
+    ],
+    "hyperparameter_search": {
+      "method": "optuna_bayesian",
+      "early_stopping": true,
+      "pruning": true
+    },
+    "validation": {
+      "scheme": "purged_group_time_series_split",
+      "n_splits": 5,
+      "embargo_pct": 0.01
+    },
+    "leakage_controls": [
+      "no_peeking_future_features",
+      "grouped_by_date",
+      "expanding_fit_only",
+      "nested_cv_optional"
+    ]
+  },
+  "strategy_catalog": [
+    {
+      "name": "overnight_edge",
+      "horizon": "1d",
+      "thesis": "exploit return difference between close to next open",
+      "signals": [
+        "prev_intraday_reversal",
+        "market_breadth",
+        "news_sentiment_shock"
+      ],
+      "status": "research"
+    },
+    {
+      "name": "short_term_mean_reversion",
+      "horizon": "1d_to_5d",
+      "thesis": "zscore of returns and rsi extremes revert",
+      "signals": [
+        "zscore_returns_5",
+        "rsi_2",
+        "volume_spike"
+      ],
+      "status": "research"
+    },
+    {
+      "name": "momentum_cross_sectional",
+      "horizon": "20d_to_60d",
+      "thesis": "winners continue losers lag",
+      "signals": [
+        "momentum_20_60",
+        "volatility_adjusted_trend",
+        "analyst_revision_confirmation"
+      ],
+      "status": "research"
+    },
+    {
+      "name": "pairs_stat_arb",
+      "horizon": "1d_to_20d",
+      "thesis": "cointegrated pairs mean revert",
+      "signals": [
+        "spread_zscore",
+        "half_life",
+        "regime_filter"
+      ],
+      "status": "research"
+    },
+    {
+      "name": "options_skew_arb",
+      "horizon": "1d_to_10d",
+      "thesis": "systematic mispricing in skew and term structure",
+      "signals": [
+        "skew_25d",
+        "term_slope",
+        "realized_vs_implied_spread"
+      ],
+      "status": "research"
+    },
+    {
+      "name": "earnings_event",
+      "horizon": "1d_to_5d",
+      "thesis": "post announcement drift and sentiment reaction",
+      "signals": [
+        "eps_surprise_standardized",
+        "transcript_sentiment_change",
+        "options_iv_crush_setup"
+      ],
+      "status": "research"
+    }
+  ],
+  "options_strategies": [
+    {
+      "name": "earnings_strangle",
+      "idea": "buy wings when iv underprices realized post event move",
+      "risk_bounds": {
+        "max_premium_pct_nav": 0.5,
+        "per_symbol_premium_cap": 0.1
+      }
+    },
+    {
+      "name": "vertical_spread_value",
+      "idea": "sell overpriced skew and hedge with nearer strike",
+      "risk_bounds": {
+        "max_short_gamma_nav_pct": 0.5,
+        "delta_target": 0.2
+      }
+    },
+    {
+      "name": "calendar_iv_term",
+      "idea": "long cheap term short expensive front",
+      "risk_bounds": {
+        "vega_target": 0.3,
+        "theta_target": 0.1
+      }
+    },
+    {
+      "name": "dispersion",
+      "idea": "index options vs single names implied correlation",
+      "risk_bounds": {
+        "corr_target": 0.2
+      }
+    }
+  ],
+  "arbitrage_strategies": [
+    "index_basket_vs_futures",
+    "etf_premium_discount",
+    "adr_local_dual_listing",
+    "cross_venue_microprice"
+  ],
+  "pipelines": {
+    "ingestion": {
+      "entry_point": "scripts/run_pipeline.py",
+      "steps": [
+        "pull_market_data",
+        "pull_fundamentals",
+        "pull_options",
+        "pull_sentiment",
+        "store_parquet"
+      ]
+    },
+    "preprocessing": [
+      "adjust_corporate_actions",
+      "outlier_winsorize",
+      "nan_impute_timewise",
+      "train_test_split_time_aware"
+    ],
+    "feature_engineering": [
+      "compute_technical",
+      "build_microstructure",
+      "parse_filings",
+      "nlp_sentiment",
+      "iv_surface_features",
+      "regime_detection"
+    ],
+    "label_generation": [
+      "fixed_horizon_returns",
+      "triple_barrier_events"
+    ],
+    "training": {
+      "loop": "per_strategy_per_horizon",
+      "models": "see models section",
+      "search": "optuna",
+      "tracking": "mlflow"
+    },
+    "backtesting": {
+      "engine": "backtrader",
+      "alt_engine": "vectorbt",
+      "frequency": [
+        "hour",
+        "daily"
+      ],
+      "costs": {
+        "commission_bps": 0.5,
+        "slippage_bps": 1.0
+      }
+    },
+    "paper_trading": {
+      "broker_adapter": "ibkr_or_alpaca_placeholder",
+      "sandbox": true
+    },
+    "live_trading": {
+      "broker_adapter": "ibkr_or_alpaca_placeholder",
+      "risk_checks": "pre_trade_and_post_trade"
+    }
+  },
+  "evaluation": {
+    "metrics": [
+      "sharpe",
+      "sortino",
+      "calmar",
+      "information_ratio",
+      "max_drawdown",
+      "avg_drawdown",
+      "hit_rate",
+      "avg_win_loss",
+      "turnover",
+      "capacity_estimate"
+    ],
+    "classification_metrics": [
+      "roc_auc",
+      "pr_auc",
+      "brier_score"
+    ],
+    "diagnostics": [
+      "factor_exposures",
+      "autocorrelation_of_pnl",
+      "leverage_utilization",
+      "ex_ante_vs_realized_risk",
+      "psI_feature_drift"
+    ],
+    "reporting": {
+      "artifact_paths": [
+        "reports/per_strategy",
+        "reports/ensemble",
+        "evaluation/feature_importance",
+        "evaluation/attribution"
+      ],
+      "export_formats": [
+        "html",
+        "pdf"
+      ]
+    }
+  },
+  "risk_management": {
+    "position_limit_pct_nav": 2.0,
+    "sector_limit_pct_nav": 10.0,
+    "gross_leverage_max": 3.0,
+    "net_exposure_bounds": [
+      -0.2,
+      0.2
+    ],
+    "stop_loss_intraday_pct": 2.5,
+    "stop_loss_daily_pct": 3.5,
+    "take_profit_trail_pct": 4.0,
+    "vol_target_annualized": 0.12,
+    "kelly_fraction_cap": 0.25,
+    "turnover_target_daily": 0.8,
+    "hard_borrow_cost_max_annual": 0.15,
+    "hard_to_borrow_filter": true,
+    "pre_trade_checks": [
+      "hard_borrow",
+      "universe_membership",
+      "limits",
+      "wash_sale_check_placeholder"
+    ],
+    "post_trade_checks": [
+      "slippage_bounds",
+      "pnl_sanity",
+      "risk_exceedance"
+    ]
+  },
+  "execution": {
+    "order_types": [
+      "limit",
+      "marketable_limit",
+      "iceberg",
+      "twap",
+      "vwap",
+      "participation"
+    ],
+    "smart_order_routing": true,
+    "child_order_sizing": "volatility_scaled",
+    "latency_goal_ms": 50,
+    "slippage_model": "square_root_impact",
+    "transaction_cost_model": "bps_plus_spread_half"
+  },
+  "retesting": {
+    "schedules": {
+      "daily": [
+        "retrain_short_horizon_models",
+        "score_universe",
+        "rebalance_if_signal"
+      ],
+      "weekly": [
+        "walk_forward_update",
+        "feature_drift_scan",
+        "psI_threshold_check"
+      ],
+      "monthly": [
+        "universe_reconstitution",
+        "factor_exposure_audit",
+        "capacity_retest",
+        "stress_tests"
+      ],
+      "event_driven": [
+        "model_retest_on_data_vendor_change",
+        "model_retest_on_regime_shift_detection",
+        "post_earnings_recalibration"
+      ]
+    },
+    "drift_detection": {
+      "psi_threshold_warn": 0.1,
+      "psi_threshold_fail": 0.2,
+      "concept_drift_tests": [
+        "ks_test",
+        "adwin_online"
+      ]
+    }
+  },
+  "governance": {
+    "approvals_required": [
+      "strategy_owner",
+      "risk_officer"
+    ],
+    "code_review": "pull_request_required",
+    "reproducibility": [
+      "seed_everything",
+      "pin_dependencies",
+      "artifact_hashing"
+    ]
+  },
+  "compliance": {
+    "restricted_list_path": "risks/restricted_list.csv",
+    "do_not_trade_tags": [
+      "pending_mna",
+      "sanctions_risk",
+      "low_float_extreme"
+    ],
+    "reporting": [
+      "trade_blotter_daily_csv",
+      "broker_confirmations_archive",
+      "monthly_performance_package"
+    ]
+  },
+  "experiment_tracking": {
+    "tool": "mlflow",
+    "artifact_store": "mlruns",
+    "run_naming": "strategy_name_horizon_timestamp",
+    "params_logged": [
+      "features_set",
+      "model_type",
+      "hyperparams",
+      "costs",
+      "risk_limits"
+    ]
+  },
+  "data_versioning": {
+    "tool": "dvc",
+    "remote": "s3_or_gcs_placeholder",
+    "tracked_paths": [
+      "data",
+      "features",
+      "labels",
+      "models"
+    ]
+  },
+  "version_control": {
+    "system": "git",
+    "branching": "trunk_with_feature_branches",
+    "protected_branches": [
+      "main",
+      "release"
+    ],
+    "commit_rules": [
+      "signed_commits",
+      "lint_passed",
+      "tests_passed"
+    ]
+  },
+  "logging_monitoring": {
+    "system_metrics": [
+      "latency_ms",
+      "memory_gb",
+      "cpu_pct",
+      "queue_depth"
+    ],
+    "trading_metrics": [
+      "exposure",
+      "turnover",
+      "slippage_bps",
+      "reject_rate",
+      "pnl_intraday",
+      "pnl_daily"
+    ],
+    "alerts": [
+      "risk_breach",
+      "data_stale",
+      "model_error_rate",
+      "feature_drift"
+    ]
+  },
+  "research_playbook": [
+    "formulate_hypothesis",
+    "define_leakage_safe_label",
+    "specify_feature_set",
+    "select_model_family",
+    "choose_validation",
+    "run_backtests",
+    "stress_test",
+    "risk_review",
+    "paper_trade",
+    "go_live_small",
+    "monitor_and_retest"
+  ],
+  "artifact_conventions": {
+    "naming": "strategyname_horizon_yyyymmdd_hhmm",
+    "file_formats": [
+      "parquet",
+      "csv",
+      "pickle",
+      "onnx_optional"
+    ]
+  },
+  "integration_existing": {
+    "backtester": "backtrader",
+    "frequency_default": "hour",
+    "baseline_indicators": [
+      "sma",
+      "rsi",
+      "zscore"
+    ],
+    "evaluation_baseline": [
+      "roc_auc",
+      "sharpe"
+    ],
+    "hf_models_cache": "third_party/huggingface_models"
+  },
+  "security": {
+    "secrets_manager": "dotenv_or_cloud_secret_manager",
+    "rotation_days": 90,
+    "pii_handling": "none_expected"
+  },
+  "roadmap": [
+    {
+      "phase": "week_1",
+      "goals": [
+        "wire_data_feeds",
+        "define_universe",
+        "set_mlflow_and_dvc",
+        "baseline_backtest_pipeline"
+      ],
+      "acceptance_criteria": [
+        "end_to_end_run_success",
+        "artifact_logs_present",
+        "reproducible_seeded_results"
+      ]
+    },
+    {
+      "phase": "weeks_2_to_4",
+      "goals": [
+        "implement_strategy_catalog_items",
+        "options_data_pipeline",
+        "pairs_selection_cointegration",
+        "nlp_sentiment_pipeline"
+      ],
+      "acceptance_criteria": [
+        "sharpe_greater_than_1_in_sample",
+        "stable_out_of_sample",
+        "risk_limits_respected"
+      ]
+    },
+    {
+      "phase": "month_2",
+      "goals": [
+        "ensemble_stack",
+        "execution_adapter",
+        "paper_trading",
+        "monitoring_dashboard"
+      ],
+      "acceptance_criteria": [
+        "information_ratio_positive",
+        "slippage_within_model",
+        "alerting_active"
+      ]
+    }
+  ],
+  "kpis": [
+    "oos_sharpe",
+    "drawdown_under_8_pct",
+    "turnover_under_1_2_daily",
+    "alpha_uncorrelated_to_spy_below_0_2",
+    "hit_rate_over_52_pct",
+    "slippage_error_under_20_pct_of_model"
+  ],
+  "todos_next_7_days": [
+    "select_primary_data_vendor_contract",
+    "finish_universe_config",
+    "build_triple_barrier_labeler",
+    "implement_purged_kfold",
+    "code_risk_checks",
+    "wire_mlflow_tracking",
+    "run_two_baseline_strategies_backtest"
+  ],
+  "run_commands": [
+    "python scripts/run_pipeline.py --config config/project.yaml",
+    "python scripts/run_backtest.py --strategy short_term_mean_reversion --horizon 1d",
+    "python scripts/run_backtest.py --strategy momentum_cross_sectional --horizon 20d",
+    "python scripts/retest_all.py --since 30d",
+    "python scripts/run_paper_trade.py --broker ibkr",
+    "python scripts/run_live.py --confirm_risk true"
+  ],
+  "notes": [
+    "medallion_style secrecy implies focus on process not replication",
+    "edge comes from breadth speed and strict risk"
+  ]
+}
