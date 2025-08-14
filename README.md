@@ -2,7 +2,7 @@
 
 Medallion-style quant project.
 
-Purusit of Alpha 
+Pursuit of Alpha 
 Follow Outline in pursuit_of_alpha_spec.json
 
 ## Structure
