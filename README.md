@@ -2,6 +2,9 @@
 
 Medallion-style quant project.
 
+Purusit of Alpha 
+Follow Outline in pursuit_of_alpha_spec.json
+
 ## Structure
 - data/: raw, processed, altdata
 - models/: trained, hf (FinBERT)
