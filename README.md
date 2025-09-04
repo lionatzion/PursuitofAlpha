@@ -1,5 +1,15 @@
 # Quant Backtest ML
 
+---
+title: Pursuit of Alpha
+emoji: 📈
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+license: apache-2.0
+---
+
 Medallion-style quant project.
 
 ## Structure
