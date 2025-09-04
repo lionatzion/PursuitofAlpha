@@ -1,5 +1,3 @@
-# Quant Backtest ML
-
 ---
 title: Pursuit of Alpha
 emoji: 📈
@@ -9,6 +7,8 @@ sdk: docker
 pinned: false
 license: apache-2.0
 ---
+
+# Quant Backtest ML
 
 Medallion-style quant project.
 
