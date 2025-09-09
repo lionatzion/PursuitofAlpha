@@ -7,3 +7,4 @@ ta
 transformers
 torch
 joblib
+pyyaml
