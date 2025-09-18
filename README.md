@@ -1,27 +1,22 @@
----
-title: Pursuit of Alpha
-emoji: 📈
-colorFrom: blue
-colorTo: green
-sdk: docker
-pinned: false
-license: apache-2.0
----
+# Pursuit of Alpha - AI Trading Framework
 
-# Quant Backtest ML
+   ## Live Demo on Kaggle
+   🚀 **[View Live Demo](your-kaggle-notebook-url-here)**
 
-Medallion-style quant project.
+   Complete demonstration of the AI-driven quantitative trading framework featuring:
+   - Automated data ingestion and feature engineering
+   - Machine learning model training and validation  
+   - Comprehensive backtesting with realistic constraints
+   - AI agent orchestration for end-to-end automation
 
-## Structure
-- data/: raw, processed, altdata
-- models/: trained, hf (FinBERT)
-- modules/: Python code
-- pipelines/: scripts
-- notebooks/: Colab & Jupyter
-- logs/: run outputs
-
-## Disclaimer
-The repository presents a simplified example of an ML-based trading stra
-tegy. It is for educational purposes only and does not guarantee profitable trad
-ing results. Always validate strategies thoroughly with historical testing and u
-nderstand the risks before deploying real capital.
+   ## Quick Start
+   1. Fork the Kaggle notebook above
+   2. Experiment with different symbols and parameters
+   3. Try your own trading strategies
+   
+   ## Next Steps
+   - Real-time data integration
+   - Advanced sentiment analysis
+   - Portfolio optimization
+   - Live paper trading
+   

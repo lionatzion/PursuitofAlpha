@@ -1,4 +1,4 @@
-project_root: "/content/drive/MyDrive/quant_backtest_ml"
+project_root: "."
 data:
   raw: "data/raw"
   processed: "data/processed"
