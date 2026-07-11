@@ -5,6 +5,32 @@ from pathlib import Path
 import yaml
 
 
+def test_scaffold_requires_explicit_empty_root(tmp_path):
+    source_root = Path(__file__).resolve().parents[1]
+
+    missing_root = subprocess.run(
+        [sys.executable, str(source_root / "project_scaffold.py")],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert missing_root.returncode != 0
+    assert "--root" in missing_root.stderr
+
+    occupied_root = tmp_path / "occupied"
+    occupied_root.mkdir()
+    sentinel = occupied_root / "keep.txt"
+    sentinel.write_text("preserve me")
+    occupied = subprocess.run(
+        [sys.executable, str(source_root / "project_scaffold.py"), "--root", str(occupied_root)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+    )
+    assert occupied.returncode != 0
+    assert sentinel.read_text() == "preserve me"
+
+
 def test_generated_scaffold_pipeline_contract(tmp_path):
     source_root = Path(__file__).resolve().parents[1]
     project_root = tmp_path / "generated-project"

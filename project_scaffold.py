@@ -104,6 +104,9 @@ def _module_path(root: Path, module: str) -> Path:
 def create_structure(root: str | Path) -> Path:
     """Create a scaffold whose configured pipeline modules all exist and run."""
     project_root = Path(root).expanduser().resolve()
+    if project_root.exists() and any(project_root.iterdir()):
+        raise FileExistsError(f"Refusing to overwrite non-empty directory: {project_root}")
+
     for folder in FOLDERS:
         (project_root / folder).mkdir(parents=True, exist_ok=True)
 
@@ -140,7 +143,7 @@ def create_structure(root: str | Path) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate a quant research project scaffold")
-    parser.add_argument("--root", default=".", help="Directory to create or update")
+    parser.add_argument("--root", required=True, help="New or empty directory to create")
     args = parser.parse_args()
     project_root = create_structure(args.root)
     print(f"Scaffold created at {project_root}")
