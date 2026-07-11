@@ -2,13 +2,19 @@
 train_pipeline.py
 Train a GradientBoostingClassifier on Yahoo equity data for the last 3 years.
 """
-from modules.data_ingestion import download_data
-from modules.feature_engineering import add_indicators
-from modules.model_training import prepare_features, train_classifier, save_model
+
+import argparse
 import os
 from datetime import datetime, timedelta
 
-def main():
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Train the equity model")
+    parser.parse_args()
+
+    from modules.data_ingestion import download_data
+    from modules.feature_engineering import add_indicators
+    from modules.model_training import prepare_features, save_model, train_classifier
+
     tickers = ["AAPL"]
     end_date = datetime.today()
     start_date = end_date - timedelta(days=3*365)
@@ -21,6 +27,7 @@ def main():
     print(f"Trained model ROC AUC: {auc:.4f}")
     os.makedirs("models", exist_ok=True)
     save_model(model, "models/gradient_boost_model.joblib")
+
 
 if __name__ == "__main__":
     main()

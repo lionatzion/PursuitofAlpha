@@ -2,14 +2,21 @@
 backtest_pipeline.py
 Run a backtest using the trained GradientBoostingClassifier and recent Yahoo equity data.
 """
-import joblib
-from modules.data_ingestion import download_data
-from modules.feature_engineering import add_indicators
-from modules.model_training import prepare_features
-from modules.backtesting_workflow import run_backtest
+
+import argparse
 from datetime import datetime, timedelta
 
-def main():
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Backtest the trained equity model")
+    parser.parse_args()
+
+    import joblib
+
+    from modules.backtesting_workflow import run_backtest
+    from modules.data_ingestion import download_data
+    from modules.feature_engineering import add_indicators
+    from modules.model_training import prepare_features
+
     model = joblib.load("models/gradient_boost_model.joblib")
     tickers = ["AAPL"]
     end_date = datetime.today()
@@ -21,6 +28,7 @@ def main():
     X, y = prepare_features(df, feature_cols)
     final_value = run_backtest(model, df)
     print(f"Final portfolio value: {final_value:.2f}")
+
 
 if __name__ == "__main__":
     main()

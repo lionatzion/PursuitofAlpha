@@ -3,9 +3,9 @@ feature_engineering.py
 Volume bars plus common technical indicators.
 """
 from __future__ import annotations
-import numpy as np
+
 import pandas as pd
-from ta import volatility  # for RSI convenience
+from ta import momentum
 
 
 def create_volume_bars(df: pd.DataFrame, vol_target: float = 1e6) -> pd.DataFrame:
@@ -21,19 +21,27 @@ def create_volume_bars(df: pd.DataFrame, vol_target: float = 1e6) -> pd.DataFram
 
     bars = []
     cum_vol = 0.0
-    o = h = l = c = None
+    open_price = high_price = low_price = close_price = None
     for _, row in df.iterrows():
         if cum_vol == 0:
-            o = row["Open"]
-            h = row["High"]
-            l = row["Low"]
-        h = max(h, row["High"])
-        l = min(l, row["Low"])
-        c = row["Close"]
+            open_price = row["Open"]
+            high_price = row["High"]
+            low_price = row["Low"]
+        high_price = max(high_price, row["High"])
+        low_price = min(low_price, row["Low"])
+        close_price = row["Close"]
         cum_vol += float(row["Volume"])
 
         if cum_vol >= vol_target:
-            bars.append({"Open": o, "High": h, "Low": l, "Close": c, "Volume": cum_vol})
+            bars.append(
+                {
+                    "Open": open_price,
+                    "High": high_price,
+                    "Low": low_price,
+                    "Close": close_price,
+                    "Volume": cum_vol,
+                }
+            )
             cum_vol = 0.0
 
     vol_df = pd.DataFrame(bars)
@@ -43,7 +51,11 @@ def create_volume_bars(df: pd.DataFrame, vol_target: float = 1e6) -> pd.DataFram
 
 
 def add_indicators(
-    df: pd.DataFrame, sma_fast: int = 10, sma_slow: int = 30, rsi_window: int = 14, z_window: int = 50
+    df: pd.DataFrame,
+    sma_fast: int = 10,
+    sma_slow: int = 30,
+    rsi_window: int = 14,
+    z_window: int = 50,
 ) -> pd.DataFrame:
     """
     Add SMA, RSI, Z-score. Returns a copy with new columns:
@@ -55,7 +67,7 @@ def add_indicators(
     out = df.copy()
     out[f"sma_{sma_fast}"] = out["Close"].rolling(window=sma_fast).mean()
     out[f"sma_{sma_slow}"] = out["Close"].rolling(window=sma_slow).mean()
-    out[f"rsi_{rsi_window}"] = volatility.rsi(out["Close"], window=rsi_window)
+    out[f"rsi_{rsi_window}"] = momentum.rsi(out["Close"], window=rsi_window)
 
     roll_mean = out["Close"].rolling(window=z_window).mean()
     roll_std = out["Close"].rolling(window=z_window).std()
